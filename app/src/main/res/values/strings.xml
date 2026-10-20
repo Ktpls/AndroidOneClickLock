@@ -6,4 +6,9 @@
     <!-- 无障碍服务相关 -->
     <string name="accessibility_service_name">一键锁屏无障碍服务</string>
     <string name="accessibility_service_desc">提供一键锁屏功能，通过无障碍服务模拟锁屏操作。开启后可在不激活设备管理员的情况下使用锁屏功能。</string>
+
+    <!-- 快捷设置磁贴相关 (Android 7.0+) -->
+    <string name="tile_label">一键锁屏</string>
+    <string name="tile_subtitle">点击锁定屏幕</string>
+    <string name="tile_content_desc">一键锁屏快捷开关，点击立即锁屏</string>
 </resources>

@@ -21,19 +21,27 @@ import java.lang.reflect.Method;
  * 1. 优先使用 DevicePolicyManager.lockNow() (需要设备管理员权限，标准 API)
  * 2. 回退到 PowerManager.goToSleep() 反射调用 (需要 DEVICE_POWER 权限或系统签名)
  * 3. 最后尝试无障碍服务 GLOBAL_ACTION_LOCK_SCREEN (需要无障碍权限，API 26+)
+ * <p>
+ * 支持从快捷设置磁贴触发：intent.putExtra("from_tile", true)
+ * 从磁贴触发时静默尝试锁屏，不显示 Toast 或引导界面
  */
 public class LockScreenActivity extends Activity {
 
     private static final String TAG = "OneClickLock";
     private static final int REQUEST_DEVICE_ADMIN = 1001;
     private static final int REQUEST_ACCESSIBILITY = 1002;
+    private static final String EXTRA_FROM_TILE = "from_tile";
 
     private DevicePolicyManager devicePolicyManager;
     private ComponentName adminComponent;
+    private boolean fromTile = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // 检查是否从快捷设置磁贴启动
+        fromTile = getIntent().getBooleanExtra(EXTRA_FROM_TILE, false);
 
         // 初始化设备策略管理器
         devicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
@@ -43,25 +51,38 @@ public class LockScreenActivity extends Activity {
         boolean locked = tryLockScreen();
 
         if (!locked) {
-            // 按优先级引导用户开启对应权限
-            if (!devicePolicyManager.isAdminActive(adminComponent)) {
-                // 优先引导设备管理员 (最稳定)
-                Toast.makeText(this, "请先激活设备管理员权限", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
-                intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, adminComponent);
-                intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,
-                        "一键锁屏需要设备管理员权限来锁定屏幕 (推荐方式，最稳定)");
-                startActivityForResult(intent, REQUEST_DEVICE_ADMIN);
-            } else if (!isAccessibilityEnabled()) {
-                // 次选引导无障碍服务
-                Toast.makeText(this, "建议开启无障碍服务作为备选方案", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-                startActivityForResult(intent, REQUEST_ACCESSIBILITY);
-            } else {
-                Toast.makeText(this, "锁屏失败，请检查权限", Toast.LENGTH_SHORT).show();
+            if (fromTile) {
+                // 从磁贴触发且锁屏失败：静默结束，不显示 Toast 或引导
+                Log.w(TAG, "Lock failed from tile, silently finishing");
                 finish();
+            } else {
+                // 正常启动：按优先级引导用户开启对应权限
+                handleLockFailure();
             }
         } else {
+            finish();
+        }
+    }
+
+    /**
+     * 处理锁屏失败 - 正常启动时的引导逻辑
+     */
+    private void handleLockFailure() {
+        if (!devicePolicyManager.isAdminActive(adminComponent)) {
+            // 优先引导设备管理员 (最稳定)
+            Toast.makeText(this, "请先激活设备管理员权限", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+            intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, adminComponent);
+            intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                    "一键锁屏需要设备管理员权限来锁定屏幕 (推荐方式，最稳定)");
+            startActivityForResult(intent, REQUEST_DEVICE_ADMIN);
+        } else if (!isAccessibilityEnabled()) {
+            // 次选引导无障碍服务
+            Toast.makeText(this, "建议开启无障碍服务作为备选方案", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+            startActivityForResult(intent, REQUEST_ACCESSIBILITY);
+        } else {
+            Toast.makeText(this, "锁屏失败，请检查权限", Toast.LENGTH_SHORT).show();
             finish();
         }
     }
