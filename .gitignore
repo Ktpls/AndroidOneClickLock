@@ -1,0 +1,90 @@
+# Gradle
+.gradle/
+build/
+*/build/
+*/*/build/
+
+# Local configuration
+local.properties
+*.iml
+.idea/
+*.ipr
+*.iws
+
+# Generated files
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+
+# Keystore (keep debug.keystore for reproducible builds, but not release keystores)
+*.jks
+*.keystore
+!debug.keystore
+
+# Signing configs
+signing.properties
+keystore.properties
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Android Studio
+*.hprof
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Gradle wrapper (optional - some prefer to commit it)
+# gradle/wrapper/gradle-wrapper.jar
+
+# Build outputs
+app/build/
+app/release/
+app/debug/
+
+# Test outputs
+test-results/
+androidTest-results/
+
+# Lint
+lint-results.html
+lint-results-*.html
+
+# Profiler
+*.hprof
+
+# Backup files
+*~
+*.bak
+*.orig
+
+# Logs
+*.log
+
+# Temp files
+tmp/
+temp/
+*.tmp
+
+# IDE
+.vscode/
+*.swp
+*.swo
+
+# Mac
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Project specific
+work/
+*.apk
+*.apkk

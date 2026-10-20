@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">一键锁屏</string>
+    <string name="admin_label">一键锁屏设备管理员</string>
+    <string name="admin_description">提供一键锁屏功能，需要设备管理员权限来锁定屏幕</string>
+
+    <!-- 无障碍服务相关 -->
+    <string name="accessibility_service_name">一键锁屏无障碍服务</string>
+    <string name="accessibility_service_desc">提供一键锁屏功能，通过无障碍服务模拟锁屏操作。开启后可在不激活设备管理员的情况下使用锁屏功能。</string>
+</resources>
